@@ -34,6 +34,12 @@ amdgpu-install -y --usecase=rocm --no-dkms
 
 ## 2. Create the ROCm Python Environment
 
+`uv` is required. Install it with:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | bash
+```
+
 Run from the repo root:
 
 ```bash
@@ -60,10 +66,24 @@ bash scripts/rocm/verify_rocm_nemo.sh
 Expected result:
 
 ```text
-GPU: Radeon RX 7900 XT
-FP16 matmul: ok
-NeMo imports: ok
+== AMD ROCm Radeon devices ==
+  Name:                    gfx1100
+  Marketing Name:          Radeon RX 7900 XT
+
+== AMD ROCm PyTorch + NeMo Speech ==
+nemo 3.1.0+981fd4e0d2
+torch 2.9.1+rocm7.2.1
+hip 7.2.1
+cuda_available True
+gpu Radeon RX 7900 XT
+fp16_matmul torch.float16 ok
+imports ASRModel FastPitchModel nemo.collections.audio nemo.collections.speechlm2
+
+== Python package consistency ==
 No broken requirements found.
+
+== NVIDIA/CUDA extras absence check ==
+ok
 ```
 
 ## 4. Test Mic Dictation
@@ -72,6 +92,7 @@ List capture devices:
 
 ```bash
 arecord -l
+arecord -L
 ```
 
 Record and transcribe 7 seconds from a specific ALSA input:
@@ -92,6 +113,13 @@ backed by ROCm/HIP. PyTorch intentionally exposes ROCm GPUs through the CUDA-com
 
 ## AMD ROCm Container Device Pass-Through
 
+Resolve the host audio runtime directory before creating the container:
+
+```bash
+export HOST_UID="$(id -u)"
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/${HOST_UID}}"
+```
+
 The container must receive these devices and groups:
 
 ```yaml
@@ -108,10 +136,10 @@ shm_size: 8g
 security_opt:
   - seccomp=unconfined
 environment:
-  XDG_RUNTIME_DIR: /run/user/1000
-  PULSE_SERVER: unix:/run/user/1000/pulse/native
+  XDG_RUNTIME_DIR: ${XDG_RUNTIME_DIR}
+  PULSE_SERVER: unix:${XDG_RUNTIME_DIR}/pulse/native
 volumes:
-  - /run/user/1000:/run/user/1000
+  - ${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}
 ```
 
 After recreating the container, verify:
@@ -143,6 +171,13 @@ Check the environment:
 ```bash
 .venv-rocm/bin/python -m pip list --format=freeze \
   | rg -i '^(cuda|numba-cuda|nvidia|transformer-engine|flash-attn|flashoptim|deep-ep|mamba|causal-conv1d|nv-grouped-gemm)'
+```
+
+Or use `grep -Ei`:
+
+```bash
+.venv-rocm/bin/python -m pip list --format=freeze \
+  | grep -Ei '^(cuda|numba-cuda|nvidia|transformer-engine|flash-attn|flashoptim|deep-ep|mamba|causal-conv1d|nv-grouped-gemm)'
 ```
 
 A clean ROCm environment has no matches from that command.
