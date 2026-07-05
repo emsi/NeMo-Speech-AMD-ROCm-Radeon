@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-    import pipecat
-except ImportError:
-    raise ImportError("pipecat is not installed. Please install it with `pip install pipecat-ai`.")
+"""NeMo voice-agent integrations for Pipecat.
+
+The submodules in this package have different optional dependencies. Keep this
+package initializer lightweight so importing one integration does not require
+the dependencies of every other integration.
+"""

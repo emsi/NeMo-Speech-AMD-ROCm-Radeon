@@ -12,8 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .diar import NemoDiarService
-from .llm import HuggingFaceLLMService
-from .stt import NemoSTTService
-from .tts import NeMoFastPitchHiFiGANTTSService
-from .turn_taking import NeMoTurnTakingService
+"""NeMo services for Pipecat voice-agent pipelines."""
+
+from importlib import import_module
+
+__all__ = [
+    "HuggingFaceLLMService",
+    "NemoDiarService",
+    "NemoSTTService",
+    "NeMoFastPitchHiFiGANTTSService",
+    "NeMoTurnTakingService",
+]
+
+_SERVICE_MODULES = {
+    "HuggingFaceLLMService": ".llm",
+    "NemoDiarService": ".diar",
+    "NemoSTTService": ".stt",
+    "NeMoFastPitchHiFiGANTTSService": ".tts",
+    "NeMoTurnTakingService": ".turn_taking",
+}
+
+
+def __getattr__(name: str):
+    if name not in _SERVICE_MODULES:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    module = import_module(_SERVICE_MODULES[name], __name__)
+    value = getattr(module, name)
+    globals()[name] = value
+    return value
