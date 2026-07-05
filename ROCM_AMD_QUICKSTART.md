@@ -3,8 +3,7 @@
 This is the AMD-compatible NVIDIA NeMo Speech variant. It is the direct path for running NeMo Speech on an AMD Radeon GPU
 such as the Radeon RX 7900 XT (`gfx1100`) with AMD ROCm PyTorch.
 
-Use this instead of the upstream NVIDIA CUDA install path. Do not run `uv sync --extra cu13`,
-`uv sync --extra cu12`, `uv sync --extra compiled`, or `uv sync --extra all` on an AMD Radeon host.
+Use the ROCm setup scripts in this guide for AMD Radeon hosts.
 
 The Python package name remains `nemo-toolkit` and imports remain under `nemo`; the forked runtime path is AMD ROCm
 Radeon first.
@@ -43,7 +42,7 @@ bash scripts/rocm/setup_rocm_uv_env.sh
 ```
 
 This creates `.venv-rocm`, installs AMD's Radeon ROCm PyTorch wheels, installs NeMo Speech dependencies, and installs
-this AMD ROCm Radeon fork editable without CUDA extras.
+this AMD ROCm Radeon fork editable for the ROCm runtime.
 
 Activate it:
 
@@ -122,9 +121,9 @@ rocminfo | grep -E 'gfx1100|Radeon'
 arecord -l
 ```
 
-## NVIDIA/CUDA Packages To Avoid
+## ROCm Environment Sanity Check
 
-Avoid NVIDIA/CUDA extras on AMD:
+These package names indicate CUDA-only extras in the ROCm environment:
 
 ```text
 cuda-bindings
@@ -146,4 +145,4 @@ Check the environment:
   | rg -i '^(cuda|numba-cuda|nvidia|transformer-engine|flash-attn|flashoptim|deep-ep|mamba|causal-conv1d|nv-grouped-gemm)'
 ```
 
-That command should print nothing.
+A clean ROCm environment has no matches from that command.
