@@ -32,6 +32,6 @@ apt-get install -y "${AMDGPU_DEB}"
 amdgpu-install -y --usecase=rocm --no-dkms
 
 echo
-echo "ROCm runtime installed. Quick checks:"
+echo "AMD ROCm Radeon runtime installed for NeMo Speech. Quick checks:"
 rocminfo 2>/dev/null | grep -E "Name: +gfx|Marketing Name: +Radeon" || true
 rocm-smi --showproductname --showdriverversion || true

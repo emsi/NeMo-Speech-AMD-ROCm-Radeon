@@ -1,10 +1,15 @@
-# AMD ROCm Quickstart
+# AMD ROCm Radeon NeMo Speech Quickstart
 
-This is the direct path for running this repo on an AMD Radeon GPU such as the Radeon RX 7900 XT (`gfx1100`) with ROCm PyTorch.
+This is the AMD-compatible NVIDIA NeMo Speech variant. It is the direct path for running NeMo Speech on an AMD Radeon GPU
+such as the Radeon RX 7900 XT (`gfx1100`) with AMD ROCm PyTorch.
 
-Use this instead of the CUDA install path. Do not run `uv sync --extra cu13`, `uv sync --extra cu12`, `uv sync --extra compiled`, or `uv sync --extra all` on an AMD host.
+Use this instead of the upstream NVIDIA CUDA install path. Do not run `uv sync --extra cu13`,
+`uv sync --extra cu12`, `uv sync --extra compiled`, or `uv sync --extra all` on an AMD Radeon host.
 
-## Tested Target
+The Python package name remains `nemo-toolkit` and imports remain under `nemo`; the forked runtime path is AMD ROCm
+Radeon first.
+
+## Tested AMD Radeon Target
 
 - OS: Ubuntu 24.04
 - GPU: Radeon RX 7900 XT, `gfx1100`
@@ -18,7 +23,7 @@ Use this instead of the CUDA install path. Do not run `uv sync --extra cu13`, `u
 Run as root on Ubuntu 24.04:
 
 ```bash
-cd /path/to/Speech
+cd /path/to/NeMo-Speech-AMD-ROCm-Radeon
 bash scripts/rocm/install_rocm_runtime_ubuntu24.sh
 ```
 
@@ -33,11 +38,12 @@ amdgpu-install -y --usecase=rocm --no-dkms
 Run from the repo root:
 
 ```bash
-cd /path/to/Speech
+cd /path/to/NeMo-Speech-AMD-ROCm-Radeon
 bash scripts/rocm/setup_rocm_uv_env.sh
 ```
 
-This creates `.venv-rocm`, installs AMD's Radeon ROCm PyTorch wheels, installs NeMo Speech dependencies, and installs this repo editable without CUDA extras.
+This creates `.venv-rocm`, installs AMD's Radeon ROCm PyTorch wheels, installs NeMo Speech dependencies, and installs
+this AMD ROCm Radeon fork editable without CUDA extras.
 
 Activate it:
 
@@ -45,10 +51,10 @@ Activate it:
 source .venv-rocm/bin/activate
 ```
 
-## 3. Verify GPU + NeMo
+## 3. Verify AMD GPU + NeMo
 
 ```bash
-cd /path/to/Speech
+cd /path/to/NeMo-Speech-AMD-ROCm-Radeon
 bash scripts/rocm/verify_rocm_nemo.sh
 ```
 
@@ -72,7 +78,7 @@ arecord -l
 Record and transcribe 7 seconds from a specific ALSA input:
 
 ```bash
-cd /path/to/Speech
+cd /path/to/NeMo-Speech-AMD-ROCm-Radeon
 bash scripts/rocm/transcribe_mic_rocm.sh default:CARD=MV7 7
 ```
 
@@ -82,9 +88,10 @@ For another mic, replace `default:CARD=MV7` with the device shown by `arecord -L
 bash scripts/rocm/transcribe_mic_rocm.sh plughw:CARD=Generic,DEV=0 7
 ```
 
-The script records `/tmp/nemo_rocm_mic.wav`, checks that it is not silent, and transcribes it with NeMo on `cuda:0` backed by ROCm.
+The script records `/tmp/nemo_rocm_mic.wav`, checks that it is not silent, and transcribes it with NeMo on `cuda:0`
+backed by ROCm/HIP. PyTorch intentionally exposes ROCm GPUs through the CUDA-compatible API surface.
 
-## Container Device Pass-Through
+## AMD ROCm Container Device Pass-Through
 
 The container must receive these devices and groups:
 
@@ -115,7 +122,7 @@ rocminfo | grep -E 'gfx1100|Radeon'
 arecord -l
 ```
 
-## What Not To Install
+## NVIDIA/CUDA Packages To Avoid
 
 Avoid NVIDIA/CUDA extras on AMD:
 

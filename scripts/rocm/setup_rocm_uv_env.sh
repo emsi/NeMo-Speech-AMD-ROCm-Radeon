@@ -3,6 +3,8 @@ set -euo pipefail
 
 cd "$(dirname "$0")/../.."
 
+echo "Setting up AMD ROCm Radeon NeMo Speech environment"
+
 if ! command -v uv >/dev/null 2>&1; then
   echo "uv is required. Install it first: https://docs.astral.sh/uv/getting-started/installation/" >&2
   exit 1
@@ -27,8 +29,8 @@ uv pip install --python "${PY}" --link-mode=copy \
   'https://repo.radeon.com/rocm/manylinux/rocm-rel-7.2.1/torchaudio-2.9.0%2Brocm7.2.1.gite3c6ee2b-cp312-cp312-linux_x86_64.whl' \
   'https://repo.radeon.com/rocm/manylinux/rocm-rel-7.2.1/triton-3.5.1%2Brocm7.2.1.gita272dfa8-cp312-cp312-linux_x86_64.whl'
 
-# Install NeMo Speech dependencies manually. Do not use cu12, cu13, compiled,
-# compiled-a100, all, or uv sync on AMD hosts.
+# Install NeMo Speech dependencies manually for AMD ROCm Radeon. Do not use
+# cu12, cu13, compiled, compiled-a100, all, or uv sync on AMD hosts.
 uv pip install --python "${PY}" --link-mode=copy \
   'numpy==1.26.4' \
   aistore 'fsspec>=2024.12.0' 'huggingface_hub>=0.24' 'onnx>=1.7.0' \
@@ -50,5 +52,5 @@ uv pip install --python "${PY}" --link-mode=copy \
 uv pip install --python "${PY}" --link-mode=copy --no-deps --reinstall -e .
 
 echo
-echo "ROCm NeMo environment ready: ${VENV}"
+echo "AMD ROCm Radeon NeMo Speech environment ready: ${VENV}"
 echo "Activate with: source ${VENV}/bin/activate"

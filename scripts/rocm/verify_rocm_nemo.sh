@@ -11,14 +11,14 @@ if [[ ! -x "${PY}" ]]; then
   exit 1
 fi
 
-echo "== ROCm devices =="
+echo "== AMD ROCm Radeon devices =="
 rocminfo | grep -E "Name: +gfx|Marketing Name: +Radeon" || {
   echo "ROCm did not report an AMD GPU." >&2
   exit 1
 }
 
 echo
-echo "== PyTorch + NeMo =="
+echo "== AMD ROCm PyTorch + NeMo Speech =="
 "${PY}" - <<'PY'
 import torch
 import nemo
@@ -51,7 +51,7 @@ echo "== Python package consistency =="
 "${PY}" -m pip check
 
 echo
-echo "== CUDA/NVIDIA extras check =="
+echo "== NVIDIA/CUDA extras absence check =="
 bad_packages="$("${PY}" -m pip list --format=freeze | grep -Ei '^(cuda|numba-cuda|nvidia|transformer-engine|flash-attn|flashoptim|deep-ep|mamba|causal-conv1d|nv-grouped-gemm)' || true)"
 if [[ -n "${bad_packages}" ]]; then
   echo "Unexpected CUDA/NVIDIA packages found:" >&2

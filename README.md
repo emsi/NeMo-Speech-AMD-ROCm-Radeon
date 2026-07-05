@@ -7,8 +7,19 @@
 [![PyPi total downloads](https://static.pepy.tech/personalized-badge/nemo-toolkit?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=downloads)](https://pepy.tech/project/nemo-toolkit)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-# **NVIDIA NeMo Speech**
-Checkout our [HuggingFace🤗 collection](https://huggingface.co/collections/nvidia/nemotron-speech) for the latest open
+# **AMD ROCm Radeon NeMo Speech**
+
+> **AMD / ROCm / Radeon fork of NVIDIA NeMo Speech.**
+>
+> This repository is the Radeon-compatible variant: it is set up for AMD GPUs, ROCm/HIP PyTorch, FP16 mixed precision,
+> and microphone dictation inside ROCm-capable containers. The upstream NeMo Speech project is NVIDIA/CUDA-first; this
+> fork intentionally avoids CUDA wheel extras, `cuda-bindings`, `cuda-python`, `numba-cuda`, Transformer Engine,
+> FlashAttention, DeepEP, Mamba, and other NVIDIA-only compiled extras.
+>
+> The Python package still installs as `nemo-toolkit` and the import namespace remains `nemo`. Only the runtime path,
+> setup scripts, and fork documentation are changed for AMD Radeon ROCm use.
+
+Checkout the upstream [HuggingFace🤗 collection](https://huggingface.co/collections/nvidia/nemotron-speech) for the latest open
 weight checkpoints and demos!
 
 ## Updates
@@ -40,22 +51,39 @@ weight checkpoints and demos!
 
 ## Introduction
 
-NVIDIA NeMo Speech is built for researchers and PyTorch developers working on Speech models including Automatic Speech
+This AMD ROCm Radeon fork of NVIDIA NeMo Speech is built for researchers and PyTorch developers working on Speech models including Automatic Speech
 Recognition (ASR), Text to Speech (TTS), and Speech LLMs. It is designed to help you efficiently create, customize, and
-deploy new AI models by leveraging existing code and pre-trained model checkpoints.
+deploy new AI models by leveraging existing code and pre-trained model checkpoints while running on AMD Radeon GPUs via
+ROCm PyTorch.
 
-For technical documentation, please see the
+The tested path in this fork is:
+
+- AMD Radeon RX 7900 XT / `gfx1100`
+- ROCm 7.2.1 user-space runtime
+- AMD Radeon PyTorch `2.9.1+rocm7.2.1`
+- Python 3.12 via `uv`
+- FP16 / mixed precision first
+- ASR microphone dictation through `/dev/snd` plus ROCm GPU passthrough in containers
+
+For upstream model and API documentation, please see the
 [NeMo Framework User Guide](https://docs.nvidia.com/nemo/speech/nightly/).
 
 ## Requirements
 
-NeMo Speech works with the **Python, PyTorch, and CUDA versions of your choosing**:
+For this AMD ROCm Radeon fork, the primary supported runtime is:
 
-- Python 3.12 or above
-- PyTorch 2.7 or above (CPU, CUDA, etc. — your choice)
-- NVIDIA GPU + CUDA (required for training; recommended for inference)
+- Ubuntu 24.04
+- AMD Radeon GPU supported by AMD's Radeon ROCm matrix
+- ROCm 7.2.1 user-space runtime
+- AMD Radeon PyTorch wheels from `repo.radeon.com`
+- Python 3.12 or above, managed with `uv`
 
-If you already have a Python/PyTorch/CUDA stack that satisfies those minimums, NeMo Speech installs on top of it **without replacing it**, so your existing PyTorch build is kept (see the install options below). The versions pinned in `uv.lock` and shipped in the official container — Python 3.13, PyTorch 2.12, CUDA 12.6/13.2 — are simply the combination we actively test and support. They make setup turnkey and reproducible, but they are **not** a hard requirement.
+The upstream CUDA path is still present in the source tree for reference, but it is **not** the install path for this
+fork. On AMD Radeon hosts, do not use `uv sync --extra cu13`, `uv sync --extra cu12`, `uv sync --extra compiled`, or
+`uv sync --extra all`.
+
+If you need the original NVIDIA CUDA install flow, keep using upstream NeMo Speech. This fork is documented and tested as
+an AMD ROCm Radeon variant.
 
 As of [Pytorch 2.6](https://docs.pytorch.org/docs/stable/notes/serialization.html#torch-load-with-weights-only-true),
 `torch.load` defaults to using `weights_only=True`. Some model checkpoints may require using `weights_only=False`.
@@ -70,24 +98,28 @@ can have the risk of arbitrary code execution.
 | Latest  | [![Documentation Status](https://readthedocs.com/projects/nvidia-nemo/badge/?version=main)](https://docs.nvidia.com/deeplearning/nemo/user-guide/docs/en/main/)     | [Documentation of the latest (i.e. main) branch.](https://docs.nvidia.com/nemo/speech/nightly/)          |
 | Stable  | [![Documentation Status](https://readthedocs.com/projects/nvidia-nemo/badge/?version=stable)](https://docs.nvidia.com/deeplearning/nemo/user-guide/docs/en/stable/) | Documentation of the stable (i.e. most recent release) - To be added |
 
-## Install NeMo Speech
+## Install AMD ROCm Radeon NeMo Speech
 
-The recommended way to install NeMo Speech is from source with [uv](https://docs.astral.sh/uv/), which reproduces our actively-tested stack from the committed `uv.lock`. If you need different Python/PyTorch/CUDA versions, NeMo also installs over your existing environment via pip — see the [pip fallback](#from-pypi-with-pip-fallback--bring-your-own-versions) below.
+The recommended path in this fork is **bring your own ROCm PyTorch, then install NeMo Speech without CUDA extras**.
 
-### AMD Radeon / ROCm
+### AMD Radeon / ROCm Default Path
 
 For AMD Radeon GPUs, use the ROCm quickstart instead of the CUDA extras:
 
 ```bash
-cd NeMo
+git clone https://github.com/emsi/NeMo-Speech-AMD-ROCm-Radeon.git
+cd NeMo-Speech-AMD-ROCm-Radeon
 bash scripts/rocm/install_rocm_runtime_ubuntu24.sh   # root, Ubuntu 24.04
 bash scripts/rocm/setup_rocm_uv_env.sh
 bash scripts/rocm/verify_rocm_nemo.sh
 ```
 
-See [ROCM_AMD_QUICKSTART.md](ROCM_AMD_QUICKSTART.md) for microphone dictation, container device pass-through, and the exact packages this path avoids.
+See [ROCM_AMD_QUICKSTART.md](ROCM_AMD_QUICKSTART.md) for microphone dictation, AMD GPU container device pass-through,
+and the exact NVIDIA/CUDA packages this path avoids.
 
-### From source with uv (recommended)
+### Upstream CUDA Path (Not For AMD Radeon)
+
+The following upstream CUDA path is retained for reference. Do **not** use it on AMD Radeon ROCm hosts.
 
 ```bash
 git clone https://github.com/NVIDIA-NeMo/NeMo.git
@@ -95,15 +127,19 @@ cd NeMo
 uv sync --extra all --extra cu13     # CUDA 13.x (recommended) — use --extra cu12 for CUDA 12.x
 ```
 
-This installs our supported stack (Python 3.13, PyTorch 2.12, CUDA 13.2) into `.venv/` with NeMo editable. Add `--group test` for the test suite or `--group docs` to build the docs; run tools via `uv run <cmd>` or activate with `source .venv/bin/activate`. On Linux, `cu12` and `cu13` are mutually exclusive — pass exactly one (`cu13` is the default). For the **exact** container baseline, add `--locked --python 3.13` (the path the Dockerfile and CI use).
+This installs the upstream NVIDIA supported stack (Python 3.13, PyTorch 2.12, CUDA 13.2) into `.venv/` with NeMo
+editable. Add `--group test` for the test suite or `--group docs` to build the docs; run tools via `uv run <cmd>` or
+activate with `source .venv/bin/activate`. On Linux, `cu12` and `cu13` are mutually exclusive; pass exactly one (`cu13`
+is the upstream default). For the exact upstream container baseline, add `--locked --python 3.13` (the path the
+Dockerfile and CI use).
 
 > **SpeechLM2 / Automodel:** the Automodel backend runs **without** any compiled dependencies. It can *optionally* benefit from dedicated accelerated backends (Transformer Engine, FlashAttention, Mamba, grouped-GEMM/MoE, DeepEP) for better performance — these source-built kernels come from the `compiled` (Hopper/Blackwell) or `compiled-a100` (A100) extras, built by `docker/Dockerfile` (`GPU_TARGET=h100plus` / `a100`). See the [installation guide](https://docs.nvidia.com/nemo/speech/nightly/) for the full list and build details.
 
-### Docker (turnkey, our supported stack)
+### Upstream NVIDIA Docker (Not For AMD Radeon)
 
 > **NGC container:** _Coming soon — the pull command for the prebuilt NeMo Speech container image will be published here._
 
-To build the container from source (CUDA 13 / H100+ by default):
+To build the upstream NVIDIA CUDA container from source (CUDA 13 / H100+ by default):
 
 ```bash
 git clone https://github.com/NVIDIA-NeMo/NeMo.git
@@ -114,27 +150,32 @@ docker run --rm -it --gpus all -v "$PWD:/workspace" nemo-speech bash
 
 For A100, set `GPU_TARGET=a100` — A100 works with **both CUDA 12 and CUDA 13** (CUDA 13, the default base image, is recommended; the CUDA 12 base is a convenience). See the header of [`docker/Dockerfile`](docker/Dockerfile) for all build arguments (`BASE_IMAGE`, `GPU_TARGET`).
 
-### From PyPI with pip (fallback — bring your own versions)
+### Upstream PyPI CUDA Fallback (Not For AMD Radeon)
 
-Prefer your own Python/PyTorch/CUDA? Install your PyTorch first (any version ≥ 2.7 for your CPU/CUDA/etc. target — see the [PyTorch install matrix](https://pytorch.org/get-started/locally/)), then add NeMo and it **keeps your build**. `uv pip` (uv's fast, pip-compatible installer) works like `pip`:
+For the upstream NVIDIA path, install your PyTorch first (any version >= 2.7 for your CPU/CUDA/etc. target; see the
+[PyTorch install matrix](https://pytorch.org/get-started/locally/)), then add NeMo and it keeps your build. `uv pip`
+(uv's fast, pip-compatible installer) works like `pip`:
 
 ```bash
 uv pip install 'nemo-toolkit[asr,tts]'   # or plain: pip install 'nemo-toolkit[asr,tts]'
 ```
 
-> ⚠️ Do **not** use `uv sync --locked` for a bring-your-own stack — it applies `uv.lock` and replaces your Python/PyTorch/CUDA with the supported baseline. Use `uv pip`/`pip` here; reserve `uv sync --locked` for reproducing our stack.
+> Do **not** use `uv sync --locked` for a bring-your-own stack; it applies `uv.lock` and replaces your
+> Python/PyTorch/CUDA with the upstream supported baseline. Use `uv pip`/`pip` here; reserve `uv sync --locked` for
+> reproducing the upstream stack.
 
-To instead pull *our* pinned PyTorch build, add the CUDA extra and the matching wheel index (pip/uv pip do not read uv's project index config, so `--extra-index-url` is required):
+To instead pull the upstream pinned PyTorch build, add the CUDA extra and the matching wheel index (pip/uv pip do not
+read uv's project index config, so `--extra-index-url` is required):
 
 ```bash
 pip install 'nemo-toolkit[asr,tts,cu13]' --extra-index-url https://download.pytorch.org/whl/cu132   # CUDA 13.x
 pip install 'nemo-toolkit[asr,tts,cu12]' --extra-index-url https://download.pytorch.org/whl/cu126   # CUDA 12.x
 ```
 
-## Contribute to NeMo
+## Contribute
 
-We welcome community contributions! Please refer to
-[CONTRIBUTING.md](https://github.com/NVIDIA-NeMo/NeMo/blob/main/CONTRIBUTING.md) for the process.
+This fork is focused on AMD ROCm Radeon compatibility. For upstream NVIDIA NeMo Speech contribution rules, refer to
+[CONTRIBUTING.md](https://github.com/NVIDIA-NeMo/NeMo/blob/main/CONTRIBUTING.md).
 
 ## Licenses
 

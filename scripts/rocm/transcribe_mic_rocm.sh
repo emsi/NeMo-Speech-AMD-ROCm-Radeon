@@ -20,7 +20,7 @@ if ! command -v arecord >/dev/null 2>&1; then
   exit 1
 fi
 
-echo "Recording ${DURATION}s from ALSA device: ${DEVICE}"
+echo "Recording ${DURATION}s from ALSA device for AMD ROCm Radeon NeMo Speech: ${DEVICE}"
 rm -f "${WAV}"
 arecord -D "${DEVICE}" -f S16_LE -r 16000 -c 1 -d "${DURATION}" "${WAV}"
 

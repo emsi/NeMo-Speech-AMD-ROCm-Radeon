@@ -1,8 +1,14 @@
-# ROCm NeMo Speech Setup
+# AMD ROCm Radeon NeMo Speech Setup
 
 Date: 2026-07-05
 
-This checkout is configured for NeMo Speech on an AMD Radeon RX 7900 XT using AMD Radeon ROCm PyTorch wheels. The environment intentionally avoids NeMo's CUDA extras, CUDA PyTorch wheels, `cuda-bindings`, `cuda-python`, `numba-cuda`, Transformer Engine, FlashAttention, DeepEP, Mamba, and other NVIDIA compiled extras.
+This checkout is the AMD-compatible NVIDIA NeMo Speech variant. It is configured for NeMo Speech on an AMD Radeon RX
+7900 XT using AMD Radeon ROCm PyTorch wheels. The environment intentionally avoids NeMo's CUDA extras, CUDA PyTorch
+wheels, `cuda-bindings`, `cuda-python`, `numba-cuda`, Transformer Engine, FlashAttention, DeepEP, Mamba, and other
+NVIDIA compiled extras.
+
+The repository branding and setup path are AMD ROCm Radeon first. The Python distribution still installs as
+`nemo-toolkit` and the import namespace remains `nemo` for upstream NeMo compatibility.
 
 ## Sources Used
 
@@ -45,7 +51,7 @@ rocminfo 1.0.0.70201-81~24.04
 
 This install also created `/opt/rocm -> /opt/rocm-7.2.1` via alternatives.
 
-## Python Environment
+## AMD ROCm Python Environment
 
 The environment is managed by `uv` at:
 
@@ -70,7 +76,8 @@ uv pip install --python .venv-rocm/bin/python \
   'https://repo.radeon.com/rocm/manylinux/rocm-rel-7.2.1/triton-3.5.1%2Brocm7.2.1.gita272dfa8-cp312-cp312-linux_x86_64.whl'
 ```
 
-Installed NeMo common, ASR, audio, TTS, and the non-CUDA `speechlm2` import dependency `peft<=0.18.0` manually, then installed the local package editable with no dependency resolution:
+Installed NeMo common, ASR, audio, TTS, and the non-CUDA `speechlm2` import dependency `peft<=0.18.0` manually, then
+installed this AMD ROCm Radeon fork editable with no dependency resolution:
 
 ```bash
 uv pip install --python .venv-rocm/bin/python --no-deps -e .
@@ -78,7 +85,7 @@ uv pip install --python .venv-rocm/bin/python --no-deps -e .
 
 The local `pyproject.toml` was changed to remove the Linux base dependency on `cuda-bindings`. This keeps package metadata consistent with the ROCm install path.
 
-## Verification
+## AMD Radeon Verification
 
 ROCm sees the GPU:
 
@@ -132,7 +139,7 @@ HIP: 7.2.53211-e1a6bc5663
 Result: transcription completed successfully
 ```
 
-## Usage
+## AMD ROCm Usage
 
 Activate the environment:
 
