@@ -74,6 +74,19 @@ can have the risk of arbitrary code execution.
 
 The recommended way to install NeMo Speech is from source with [uv](https://docs.astral.sh/uv/), which reproduces our actively-tested stack from the committed `uv.lock`. If you need different Python/PyTorch/CUDA versions, NeMo also installs over your existing environment via pip — see the [pip fallback](#from-pypi-with-pip-fallback--bring-your-own-versions) below.
 
+### AMD Radeon / ROCm
+
+For AMD Radeon GPUs, use the ROCm quickstart instead of the CUDA extras:
+
+```bash
+cd NeMo
+bash scripts/rocm/install_rocm_runtime_ubuntu24.sh   # root, Ubuntu 24.04
+bash scripts/rocm/setup_rocm_uv_env.sh
+bash scripts/rocm/verify_rocm_nemo.sh
+```
+
+See [ROCM_AMD_QUICKSTART.md](ROCM_AMD_QUICKSTART.md) for microphone dictation, container device pass-through, and the exact packages this path avoids.
+
 ### From source with uv (recommended)
 
 ```bash
